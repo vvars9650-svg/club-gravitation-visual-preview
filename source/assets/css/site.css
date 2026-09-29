@@ -48,4 +48,5 @@ html,body{overflow-x:hidden}
   .page-about .story-copy .prose-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-top:28px}
   .page-about .story-copy .pull-quote{max-width:340px;margin-top:20px;font-size:clamp(1.3rem,5.6vw,1.55rem);line-height:1.32;text-wrap:pretty}
   .page-about .story-copy .pull-quote .quote-no-break{white-space:nowrap}
+  .page-about .section--values .section-heading h2{letter-spacing:.012em!important}
 }
