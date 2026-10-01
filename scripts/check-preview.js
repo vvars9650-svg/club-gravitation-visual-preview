@@ -31,6 +31,13 @@ assert.match(applyHtml, /name="gravitation-visual-preview"/u);
 assert.match(applyHtml, /connect-src 'none'; form-action 'none'/u);
 assert.match(applyHtml, /name="profile_or_messenger_url" type="text" required/u);
 assert.match(applyHtml, /role="combobox"/u);
+assert.match(applyHtml, /placeholder="Укажите мессенджер или контакт"/u);
+assert.doesNotMatch(applyHtml, /form-tabs|form-progress|form-step|form-next|form-back|id="review"|name="(?:occupation|life_outside_work|source|public_profile_url|desired_connections|acquaintance_methods)"/u);
+assert.match(applyHtml, /img-src 'self' data: blob:/u);
+assert.match(applyScript, /FORM-2\.3/u);
+assert.match(applyScript, /data-photo-remove/u);
+assert.match(applyScript, /URL\.createObjectURL/u);
+assert.match(applyScript, /URL\.revokeObjectURL/u);
 assert.doesNotMatch(applyHtml, /public-config|action=|name="preferred_contact"/u);
 for (const directory of [path.join(OUTPUT, 'assets/js'), path.join(__dirname, '../source/assets/js')]) {
   for (const file of fs.readdirSync(directory)) {

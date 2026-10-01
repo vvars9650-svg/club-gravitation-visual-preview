@@ -90,7 +90,7 @@ function build() {
       html = html.replace(/<link\s+rel="canonical"[^>]*>/giu, '');
       if (file === 'apply/index.html') {
         html = html.replace(/<script src="[^"]*public-config\.js" defer><\/script>/u, '');
-        html = html.replace('</head>', `<meta name="gravitation-visual-preview" content="submission-disabled"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'self'"></head>`);
+        html = html.replace('</head>', `<meta name="gravitation-visual-preview" content="submission-disabled"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'none'; form-action 'none'; base-uri 'self'"></head>`);
       }
       html = html.replace('</head>', '<meta name="robots" content="noindex,nofollow,noarchive"></head>');
       html = html.replace('</body>', `<script src="${BASE}assets/js/preview-only.js" defer></script></body>`);
