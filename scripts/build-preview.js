@@ -11,12 +11,13 @@ const OUTPUT = path.join(ROOT, 'site');
 const BASE = '/club-gravitation-visual-preview/';
 const URL = `https://vvars9650-svg.github.io${BASE}`;
 const PAGES = ['index.html', 'about/index.html', 'events/index.html',
-  'first-contact/index.html', 'founders/index.html'];
+  'first-contact/index.html', 'founders/index.html', 'apply/index.html'];
 const FILES = [...PAGES, 'favicon.svg', 'assets/brand/logo-mark.svg',
   'assets/css/site.css', 'assets/css/polish.css', 'assets/css/tz-20260831.css',
   'assets/css/story.css', 'assets/css/events-hub.css',
-  'assets/css/first-contact.css', 'assets/css/founders.css', 'assets/js/site.js'];
-const SAFE_ROUTES = ['apply', 'privacy', 'offer', 'terms', 'consent-pd'];
+  'assets/css/first-contact.css', 'assets/css/founders.css', 'assets/js/site.js',
+  'assets/css/apply.css', 'assets/js/apply.js'];
+const SAFE_ROUTES = [ 'privacy', 'offer', 'terms', 'consent-pd'];
 
 function resetInsideRoot(directory) {
   const resolved = path.resolve(directory);
@@ -41,6 +42,9 @@ function syncVisualSnapshot(visualRoot) {
   const artifact = path.join(visualRoot, 'public-dist');
   resetInsideRoot(SOURCE);
   FILES.forEach(file => copy(file, artifact, SOURCE));
+  // Keep the checked-in preview snapshot free of endpoints and network adapters.
+  const applyScript = path.join(SOURCE, 'assets/js/apply.js');
+  fs.writeFileSync(applyScript, isolateApply(fs.readFileSync(applyScript, 'utf8')).trimEnd() + '\n');
   fs.cpSync(path.join(artifact, 'assets/images'), path.join(SOURCE, 'assets/images'),
     {recursive: true});
 
@@ -51,6 +55,16 @@ function syncVisualSnapshot(visualRoot) {
     branch, head, diffSha256: crypto.createHash('sha256').update(diff).digest('hex'),
     capturedAt: new Date().toISOString(),
   }, null, 2)}\n`);
+}
+
+function isolateApply(script) {
+  return script
+    .replace(/https:\/\/[^'\s]+yandexcloud\.net[^']*/gu, '')
+    .replace('gravitation-v5-test-frontend-b1g4bdjb.storage.yandexcloud.net', 'disabled.invalid')
+    .replace("new Set(['club-gravitation.ru', 'www.club-gravitation.ru'])", 'new Set()')
+    .replace(/  async function parseJsonResponse[\s\S]*?(?=  function createLocalPreviewPhotoUploadAdapter)/u,
+      '  function createPhotoUploadAdapter() { return createLocalPreviewPhotoUploadAdapter(); }\n  function createMountedPhotoUploadAdapter() { return createLocalPreviewPhotoUploadAdapter(); }\n\n')
+    .replaceAll('root.fetch.bind(root)', 'createLocalPreviewFetch()');
 }
 
 function prefixLocalUrls(text) {
@@ -74,6 +88,10 @@ function build() {
     if (file.endsWith('.html')) {
       let html = prefixLocalUrls(fs.readFileSync(path.join(SOURCE, file), 'utf8'));
       html = html.replace(/<link\s+rel="canonical"[^>]*>/giu, '');
+      if (file === 'apply/index.html') {
+        html = html.replace(/<script src="[^"]*public-config\.js" defer><\/script>/u, '');
+        html = html.replace('</head>', `<meta name="gravitation-visual-preview" content="submission-disabled"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'self'"></head>`);
+      }
       html = html.replace('</head>', '<meta name="robots" content="noindex,nofollow,noarchive"></head>');
       html = html.replace('</body>', `<script src="${BASE}assets/js/preview-only.js" defer></script></body>`);
       writeText(file, html);

@@ -1,6 +1,7 @@
 {
   "branch": "visual/post-launch",
   "head": "410c39392f5be49d56a87dadd7103bde1d2768e3",
-  "diffSha256": "c842ff65da03ea68bd5a52565ee088422f14a3f16fb6d6f8866cf61662fb6f03",
-  "capturedAt": "2026-09-29T20:38:23.679Z"
+  "diffSha256": "40b512c97273cf1036d7a629113126f3290c61ef517ebba26dd5ff567b6b8bda",
+  "capturedAt": "2026-10-01T10:08:24.897Z",
+  "scope": "Apply UI only; previously published pages preserved"
 }

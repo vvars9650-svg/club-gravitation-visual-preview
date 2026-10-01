@@ -9,7 +9,7 @@ const htmlFiles = [...PAGES, ...SAFE_ROUTES.map(route => `${route}/index.html`),
 for (const file of htmlFiles) {
   const html = fs.readFileSync(path.join(OUTPUT, file), 'utf8');
   assert.match(html, /<meta name="robots" content="noindex,nofollow,noarchive">/u, file);
-  assert.doesNotMatch(html, /<form\b|<input\b/iu, file);
+  if (file !== 'apply/index.html') assert.doesNotMatch(html, /<form\b|<input\b/iu, file);
   assert.doesNotMatch(html, /(?:href|src|srcset)="\/(?!club-gravitation-visual-preview\/)/iu, file);
   for (const [, reference] of html.matchAll(/(?:href|src|srcset)="([^"]+)"/giu)) {
     for (const value of reference.split(',').map(part => part.trim().split(/\s+/u)[0])) {
@@ -24,7 +24,19 @@ for (const file of htmlFiles) {
 const script = fs.readFileSync(path.join(OUTPUT, 'assets/js/site.js'), 'utf8');
 assert.doesNotMatch(script, /\bfetch\s*\(|XMLHttpRequest|sendBeacon/iu);
 assert.match(script, new RegExp(`${BASE}about/`, 'u'));
-assert.equal(fs.existsSync(path.join(OUTPUT, 'assets/js/apply.js')), false);
+const applyScript = fs.readFileSync(path.join(OUTPUT, 'assets/js/apply.js'), 'utf8');
+assert.doesNotMatch(applyScript, /yandexcloud|root\.fetch|XMLHttpRequest|sendBeacon/iu);
+const applyHtml = fs.readFileSync(path.join(OUTPUT, 'apply/index.html'), 'utf8');
+assert.match(applyHtml, /name="gravitation-visual-preview"/u);
+assert.match(applyHtml, /connect-src 'none'; form-action 'none'/u);
+assert.match(applyHtml, /name="profile_or_messenger_url" type="text" required/u);
+assert.match(applyHtml, /role="combobox"/u);
+assert.doesNotMatch(applyHtml, /public-config|action=|name="preferred_contact"/u);
+for (const directory of [path.join(OUTPUT, 'assets/js'), path.join(__dirname, '../source/assets/js')]) {
+  for (const file of fs.readdirSync(directory)) {
+    assert.doesNotMatch(fs.readFileSync(path.join(directory, file), 'utf8'), /apigw|yandexcloud|__V5_PHOTO_UPLOAD_ADAPTER__/iu, file);
+  }
+}
 assert.equal(fs.existsSync(path.join(OUTPUT, 'assets/js/public-config.js')), false);
 assert.equal(fs.existsSync(path.join(OUTPUT, 'admin-prod')), false);
 assert.equal(fs.existsSync(path.join(OUTPUT, 'CNAME')), false);
