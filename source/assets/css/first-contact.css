@@ -17,3 +17,7 @@
 
 /* Mobile format and dress-code refinement */
 @media(max-width:600px){.included-card{border-left:0}.first-contact-dress dl div{grid-template-columns:170px 20px minmax(0,1fr);gap:12px;justify-content:start}.first-contact-dress dt{text-align:left}.first-contact-dress dd{text-align:left}.first-contact-dress dd::before{left:-32px;right:auto}}
+
+/* Keep the shorter story paragraphs in their reading order. */
+.first-contact-story__body{column-count:1}
+.first-contact-dress__body p{white-space:normal}

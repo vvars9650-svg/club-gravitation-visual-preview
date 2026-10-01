@@ -50,3 +50,12 @@ html,body{overflow-x:hidden}
   .page-about .story-copy .pull-quote .quote-no-break{white-space:nowrap}
   .page-about .section--values .section-heading h2{letter-spacing:.012em!important}
 }
+
+/* Persistent public navigation; reserve the existing header height. */
+:root{--site-header-height:82px}
+html{scroll-padding-top:calc(var(--site-header-height) + 16px)}
+body{padding-top:var(--site-header-height)}
+body.home-page{padding-top:0}
+.site-header,.home-page .site-header,.page-apply .site-header{position:fixed!important;inset:0 0 auto;width:100%}
+.home-page .site-header{background:rgba(13,13,15,.96)}
+@media(max-width:900px){:root{--site-header-height:72px}}
