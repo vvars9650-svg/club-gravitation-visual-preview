@@ -1,8 +1,8 @@
 {
   "branch": "visual/post-launch",
   "head": "410c39392f5be49d56a87dadd7103bde1d2768e3",
-  "diffSha256": "ab0a2c9fd8a67a38d3f2c61d44b85edfc9405fd3c417a1464c157310a5c9e6c3",
-  "capturedAt": "2026-10-01T10:57:33.889Z",
-  "scope": "Single-page apply only; previously published public pages preserved",
-  "previousSnapshot": "cdcaa3b0ee9d04ecbf3883d759f379065149b47285dce7bb6971656abdcc5e42"
+  "diffSha256": "4d936a14480ec98ddda077a6af7eda88930bc7a25a445d8a2bd87f96bda2c4ec",
+  "capturedAt": "2026-10-12T16:37:34.558Z",
+  "scope": "EVENT 01 orbit/program/collage, about values heading, founders word replacement; other preview pages preserved",
+  "previousSnapshot": "ab0a2c9fd8a67a38d3f2c61d44b85edfc9405fd3c417a1464c157310a5c9e6c3"
 }
