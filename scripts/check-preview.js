@@ -3,9 +3,9 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const {BASE, OUTPUT, PAGES, SAFE_ROUTES} = require('./build-preview');
+const {BASE, OUTPUT, PAGES, LEGAL_DOCUMENTS, LEGAL_PAGES} = require('./build-preview');
 
-const htmlFiles = [...PAGES, ...SAFE_ROUTES.map(route => `${route}/index.html`), '404.html'];
+const htmlFiles = [...PAGES, ...LEGAL_PAGES, '404.html'];
 for (const file of htmlFiles) {
   const html = fs.readFileSync(path.join(OUTPUT, file), 'utf8');
   assert.match(html, /<meta name="robots" content="noindex,nofollow,noarchive">/u, file);
@@ -47,8 +47,15 @@ for (const directory of [path.join(OUTPUT, 'assets/js'), path.join(__dirname, '.
 assert.equal(fs.existsSync(path.join(OUTPUT, 'assets/js/public-config.js')), false);
 assert.equal(fs.existsSync(path.join(OUTPUT, 'admin-prod')), false);
 assert.equal(fs.existsSync(path.join(OUTPUT, 'CNAME')), false);
-for (const route of SAFE_ROUTES) {
+for (const [route, document] of Object.entries(LEGAL_DOCUMENTS)) {
   const html = fs.readFileSync(path.join(OUTPUT, route, 'index.html'), 'utf8');
-  assert.match(html, /заявки не принимаются/u);
+  const encoded = html.match(/<pre\b[^>]*class="legal__frozen"[^>]*>([\s\S]*?)<\/pre>/u)?.[1];
+  assert.ok(encoded, route + ': full text missing');
+  const text = encoded.replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&amp;', '&');
+  assert.equal(text, fs.readFileSync(path.join(__dirname, '../source/legal/frozen', document), 'utf8'), route + ': frozen text changed');
+  assert.doesNotMatch(html, /fetch\s*\(|Загрузка утверждённого текста|заявки не принимаются/u, route);
 }
-console.log('Preview routes, noindex and submission isolation verified');
+for (const route of ['privacy', 'consent-pd']) assert.match(applyHtml, new RegExp('href="' + BASE + route + '/"', 'u'));
+assert.doesNotMatch(applyHtml, /<a\b[^>]*href="[^"]*\/(?:privacy|consent-pd)\/"[^>]*target="_blank"/u);
+for (const entry of ['admin-test', 'backend', '.env']) assert.equal(fs.existsSync(path.join(OUTPUT, entry)), false);
+console.log('Preview routes, exact frozen legal texts, noindex and submission isolation verified');

@@ -16,8 +16,14 @@ const FILES = [...PAGES, 'favicon.svg', 'assets/brand/logo-mark.svg',
   'assets/css/site.css', 'assets/css/polish.css', 'assets/css/tz-20260831.css',
   'assets/css/story.css', 'assets/css/events-hub.css',
   'assets/css/first-contact.css', 'assets/css/founders.css', 'assets/js/site.js',
-  'assets/css/apply.css', 'assets/js/apply.js'];
-const SAFE_ROUTES = [ 'privacy', 'offer', 'terms', 'consent-pd'];
+  'assets/css/apply.css', 'assets/js/apply.js', 'assets/brand/privacy-logo-transparent.png'];
+const LEGAL_DOCUMENTS = {
+  "privacy": "PPD-2.2.txt",
+  "consent-pd": "CONSENT-PD-2.2.txt",
+  "offer": "OFFER-1.0.txt",
+  "terms": "TERMS-1.2.txt"
+};
+const LEGAL_PAGES = Object.keys(LEGAL_DOCUMENTS).map(route => route + '/index.html');
 
 function resetInsideRoot(directory) {
   const resolved = path.resolve(directory);
@@ -42,6 +48,10 @@ function syncVisualSnapshot(visualRoot) {
   const artifact = path.join(visualRoot, 'public-dist');
   resetInsideRoot(SOURCE);
   FILES.forEach(file => copy(file, artifact, SOURCE));
+  for (const [route, document] of Object.entries(LEGAL_DOCUMENTS)) {
+    copy(route + '/index.html', visualRoot, SOURCE);
+    copy('legal/frozen/' + document, visualRoot, SOURCE);
+  }
   // Keep the checked-in preview snapshot free of endpoints and network adapters.
   const applyScript = path.join(SOURCE, 'assets/js/apply.js');
   fs.writeFileSync(applyScript, isolateApply(fs.readFileSync(applyScript, 'utf8')).trimEnd() + '\n');
@@ -82,6 +92,27 @@ function safePage() {
   return `<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><title>Визуальный просмотр — ГРАВИТАЦИЯ</title><link rel="stylesheet" href="${BASE}assets/css/site.css"></head><body class="inner-page"><main class="legal"><p class="eyebrow">ГРАВИТАЦИЯ</p><h1>Визуальный просмотр</h1><p>На этой версии сайта заявки не принимаются.</p><a class="button button--dark" href="${BASE}">На главную</a></main></body></html>`;
 }
 
+function escapeHtml(text) {
+  return text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+}
+
+function legalPage(route, document) {
+  let html = prefixLocalUrls(fs.readFileSync(path.join(SOURCE, route, 'index.html'), 'utf8'));
+  // Older legal templates omit explicit head/body tags. Normalize before adding metadata.
+  if (!html.includes('<head>')) {
+    html = html.replace('<html lang="ru">', '<html lang="ru"><head>')
+      .replace('<main', '</head><body><main').replace('</html>', '</body></html>');
+  }
+  html = html.replace(/<script>fetch[\s\S]*?<\/script>/gu, '');
+  html = html.replace(/<p (?:id="legal-error"|class="legal__fallback") hidden>[\s\S]*?<\/p>/gu, '');
+  html = html.replace('</head>', '<meta name="robots" content="noindex,nofollow,noarchive"><link rel="stylesheet" href="' + BASE + 'assets/css/legal-preview.css"></head>');
+  html = html.replace('</body>', '<script src="' + BASE + 'assets/js/preview-only.js" defer></script></body>');
+  const text = fs.readFileSync(path.join(SOURCE, 'legal/frozen', document), 'utf8');
+  // Inject last: URL rewriting must never alter the approved document text.
+  if (!/<pre\b[^>]*class="legal__frozen"[^>]*>[\s\S]*?<\/pre>/u.test(html)) throw new Error('Missing frozen text container: ' + route);
+  return html.replace(/(<pre\b[^>]*class="legal__frozen"[^>]*>)[\s\S]*?(<\/pre>)/u, (_, open, close) => open + escapeHtml(text) + close);
+}
+
 function build() {
   resetInsideRoot(OUTPUT);
   for (const file of FILES) {
@@ -89,6 +120,8 @@ function build() {
       let html = prefixLocalUrls(fs.readFileSync(path.join(SOURCE, file), 'utf8'));
       html = html.replace(/<link\s+rel="canonical"[^>]*>/giu, '');
       if (file === 'apply/index.html') {
+        // Legal navigation stays in this tab so mobile users can return with Back.
+        html = html.replace(/(<a\b[^>]*href="[^"]*\/(?:privacy|consent-pd)\/"[^>]*?) target="_blank"/gu, '$1');
         html = html.replace(/<script src="[^"]*public-config\.js" defer><\/script>/u, '');
         html = html.replace('</head>', `<meta name="gravitation-visual-preview" content="submission-disabled"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'none'; form-action 'none'; base-uri 'self'"></head>`);
       }
@@ -103,7 +136,8 @@ function build() {
   }
   fs.cpSync(path.join(SOURCE, 'assets/images'), path.join(OUTPUT, 'assets/images'),
     {recursive: true});
-  for (const route of SAFE_ROUTES) writeText(`${route}/index.html`, safePage());
+  for (const [route, document] of Object.entries(LEGAL_DOCUMENTS)) writeText(route + '/index.html', legalPage(route, document));
+  writeText('assets/css/legal-preview.css', '.legal{overflow-wrap:anywhere}.legal__frozen{white-space:pre-wrap;overflow-wrap:anywhere;min-width:0;max-width:100%}.legal-brand-art{display:block;width:min(100%,396px)}.legal-brand-art img{display:block;width:100%;height:auto}\n');
   writeText('404.html', safePage());
   writeText('.nojekyll', '');
   writeText('assets/js/preview-only.js', `document.addEventListener('submit',event=>event.preventDefault(),true);document.addEventListener('click',event=>{const link=event.target.closest('a[href]');if(link&&/^(?:mailto:|tel:)/i.test(link.href))event.preventDefault()},true);\n`);
@@ -115,4 +149,4 @@ if (require.main === module) {
   build();
 }
 
-module.exports = {BASE, FILES, OUTPUT, PAGES, SAFE_ROUTES, build};
+module.exports = {BASE, FILES, OUTPUT, PAGES, LEGAL_DOCUMENTS, LEGAL_PAGES, build};

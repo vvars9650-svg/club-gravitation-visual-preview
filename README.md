@@ -1,6 +1,6 @@
 # Gravitation visual preview
 
-This repository publishes a visual-only snapshot of `visual/post-launch` to GitHub Pages. It contains public pages, static assets, the full application UI, and inert placeholders for legal links. The application is an isolated demo: photo and submission adapters are local stubs, endpoints and runtime configuration are excluded, and CSP blocks connections and form submission. Every page keeps noindex.
+This repository publishes a visual-only snapshot of `visual/post-launch` to GitHub Pages. It contains public pages, static assets, the full application UI, and the four complete approved legal documents embedded at build time. The application is an isolated demo: photo and submission adapters are local stubs, endpoints and runtime configuration are excluded, and CSP blocks connections and form submission. Every page keeps noindex.
 
 To refresh the same preview URL from a checkout of the visual branch:
 
