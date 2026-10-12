@@ -151,7 +151,7 @@ html,body{overflow-x:hidden}
 }
 
 /* About annotation pass: centered image captions, balanced CTA, and card headings. */
-.page-about .orbit-stage__star{top:46%}
+.page-about .orbit-stage__star{top:calc(46% - 25px)}
 .page-about .story-figure--about-1 .story-figure__caption,
 .page-about .story-figure--about-2 .story-figure__caption{left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%)}
 .page-about .story-figure--about-3 .story-figure__caption{left:55%;right:auto;top:auto;bottom:10%;transform:translateX(-50%)}

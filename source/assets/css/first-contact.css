@@ -38,3 +38,9 @@
 .first-contact-program .included-card ul{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 48px}
 .first-contact-program .included-card li{white-space:normal;align-items:flex-start}
 @media(max-width:600px){.first-contact-program .included-card ul{grid-template-columns:1fr;gap:18px}.first-contact-collage img{aspect-ratio:900/2137}}
+
+.first-contact-program .included-card li::before{transform:translateY(4.5px)}
+
+.first-contact-dress dd::before{transform:translateY(4.5px)}
+
+.first-contact-hero__orb i{transform:translateY(-40px)}

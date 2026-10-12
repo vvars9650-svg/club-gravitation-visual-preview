@@ -1,8 +1,6 @@
 {
   "branch": "visual/post-launch",
   "head": "410c39392f5be49d56a87dadd7103bde1d2768e3",
-  "diffSha256": "4d936a14480ec98ddda077a6af7eda88930bc7a25a445d8a2bd87f96bda2c4ec",
-  "capturedAt": "2026-10-12T16:37:34.558Z",
-  "scope": "EVENT 01 orbit/program/collage, about values heading, founders word replacement; other preview pages preserved",
-  "previousSnapshot": "ab0a2c9fd8a67a38d3f2c61d44b85edfc9405fd3c417a1464c157310a5c9e6c3"
+  "diffSha256": "78e2741f7187fb20c5a4287ae4f3818fd276ff2f3203881e1f8fff2248875a6b",
+  "capturedAt": "2026-10-12T18:10:22.705Z"
 }
